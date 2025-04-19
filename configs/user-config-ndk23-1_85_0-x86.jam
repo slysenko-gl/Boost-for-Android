@@ -1,1 +1,2 @@
-
+<compileflags>-target
+<compileflags>i686-linux-android$(AndroidTargetVersion32)

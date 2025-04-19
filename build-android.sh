@@ -142,6 +142,12 @@ select_toolchain () {
     TOOLCHAIN=$1
 }
 
+WIN_TOOLSET=
+register_option "--toolset=<toolchain>" select_toolset "Select a Windows toolset for b2 building. To see available look at bootstrap.bat options."
+select_toolset () {
+    WIN_TOOLSET=$1
+}
+
 CLEAN=no
 register_option "--clean"    do_clean     "Delete all previously downloaded and built files, then exit."
 do_clean () {	CLEAN=yes; }
@@ -414,7 +420,7 @@ case "$NDK_RN" in
 		TOOLSET=clang
 		CONFIG_VARIANT=ndk19
 		;;
-	"22.1"|"23.0"|"23.1"|"23.2"|"25.0"|"25.1"|"25.2"|"26.0"|"26.1"|"26.2"|"26.3"|"27.0")
+	"22.1"|"23.0"|"23.1"|"23.2"|"25.0"|"25.1"|"25.2"|"26.0"|"26.1"|"26.2"|"26.3"|"27.0"|"27.1"|"28.0")
 		TOOLCHAIN=${TOOLCHAIN:-llvm}
 		CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/clang++
 		TOOLSET=clang
@@ -435,7 +441,7 @@ if [ -z "${ARCHLIST}" ]; then
 
     case "$NDK_RN" in
       # NDK 17+: Support for ARMv5 (armeabi), MIPS, and MIPS64 has been removed.
-      "17.1"|"17.2"|"18.0"|"18.1"|"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"21.4"|"22.1"|"23.0"|"23.1"|"23.2"|"25.0"|"25.1"|"25.2"|"26.0"|"26.1"|"26.2"|"26.3"|"27.0")
+      "17.1"|"17.2"|"18.0"|"18.1"|"19.0"|"19.1"|"19.2"|"20.0"|"20.1"|"21.0"|"21.1"|"21.2"|"21.3"|"21.4"|"22.1"|"23.0"|"23.1"|"23.2"|"25.0"|"25.1"|"25.2"|"26.0"|"26.1"|"26.2"|"26.3"|"27.0"|"27.1"|"28.0")
         ARCHLIST="arm64-v8a armeabi-v7a x86 x86_64"
         ;;
       *)
@@ -497,14 +503,14 @@ fi
 if [ ! -f ./$BOOST_DIR/b2 ]
 then
   # Make the initial bootstrap
-  echo "Performing boost bootstrap"
-
   cd $BOOST_DIR
   case "$HOST_OS" in
     windows)
-        cmd //c "bootstrap.bat" 2>&1 | tee -a $PROGDIR/build.log
+        echo "Performing boost bootstrap for Windows"
+        cmd //c "bootstrap.bat $WIN_TOOLSET" 2>&1 | tee -a $PROGDIR/build.log
         ;;
     *)  # Linux and others
+        echo "Performing boost bootstrap"
         ./bootstrap.sh 2>&1 | tee -a $PROGDIR/build.log
     esac
 

@@ -1,1 +1,2 @@
-
+<compileflags>-target
+<compileflags>aarch64-linux-android$(AndroidTargetVersion64)

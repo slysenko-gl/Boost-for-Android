@@ -1,1 +1,4 @@
 <compileflags>-mthumb
+<compileflags>-target
+<compileflags>armv7a-linux-androideabi$(AndroidTargetVersion32)
+
