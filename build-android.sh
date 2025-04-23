@@ -181,10 +181,11 @@ do_layout () {
 	LAYOUT=$1;
 }
 
+B2PREFIX=
 register_option "--prefix=<path>" do_prefix "Prefix to be used when installing libraries and includes."
 do_prefix () {
     if [ -d $1 ]; then
-        PREFIX=$1;
+        B2PREFIX=$1;
     fi
 }
 
@@ -253,7 +254,7 @@ echo "Building boost version: $BOOST_VER1.$BOOST_VER2.$BOOST_VER3"
 BOOST_DOWNLOAD_LINK="https://archives.boost.io/release/$BOOST_VER1.$BOOST_VER2.$BOOST_VER3/source/boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
 BOOST_TAR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}.tar.bz2"
 BOOST_DIR="boost_${BOOST_VER1}_${BOOST_VER2}_${BOOST_VER3}"
-BUILD_DIR="./build/"
+BUILD_DIR="build"
 
 # -----------------------
 
@@ -662,6 +663,13 @@ echo "Building boost for android for $ARCH"
       unset WITHOUT_LIBRARIES
   fi
 
+  if [ -z $B2PREFIX ]; then
+    prefix="../$BUILD_DIR/out/$ARCH"
+  else
+    prefix="$B2PREFIX/boost-${BOOST_VER1}.${BOOST_VER2}.${BOOST_VER3}/$ARCH"
+    mkdir -p $prefix
+  fi
+
   {
     ./b2 -q                          \
         -d+2                         \
@@ -679,7 +687,7 @@ echo "Building boost for android for $ARCH"
         -sICONV_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
         -sICU_PATH=`pwd`/../libiconv-libicu-android/$ARCH \
         --build-dir="./../$BUILD_DIR/build/$ARCH" \
-        --prefix="./../$BUILD_DIR/out/$ARCH" \
+        --prefix=$prefix \
         $LIBRARIES                   \
         $LIBRARIES_BROKEN            \
         install 2>&1                 \
@@ -690,12 +698,5 @@ echo "Building boost for android for $ARCH"
 )
 
 dump "Done!"
-
-if [ $PREFIX ]; then
-    echo "Prefix set, copying files to $PREFIX"
-    mkdir -p $PREFIX/$ARCH
-    cp -r $PROGDIR/$BUILD_DIR/out/$ARCH/lib $PREFIX/$ARCH/
-    cp -r $PROGDIR/$BUILD_DIR/out/$ARCH/include $PREFIX/$ARCH/
-fi
 
 done # for ARCH in $ARCHLIST
