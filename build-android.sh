@@ -294,7 +294,10 @@ fi
 
 AndroidNDKRoot=$PARAMETERS
 if [ -z "$AndroidNDKRoot" ] ; then
-  if [ -n "${ANDROID_BUILD_TOP}" ]; then # building from Android sources
+  if [ -d "${NDK_ROOT}" ]; then
+    echo "Found NDK_ROOT folder in environment"
+    AndroidNDKRoot="${NDK_ROOT}"
+   elif [ -n "${ANDROID_BUILD_TOP}" ]; then # building from Android sources
     AndroidNDKRoot="${ANDROID_BUILD_TOP}/prebuilts/ndk/current"
     export AndroidSourcesDetected=1
   elif [ -z "`which ndk-build`" ]; then
